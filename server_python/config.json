@@ -1,7 +1,0 @@
-{
-    "host": "localhost",
-    "port": 5432,
-    "dbname": "panelReaction",
-    "user": "postgres",
-    "pswd": "ab-320"
-}
