@@ -1,0 +1,7 @@
+{
+  "dbname": "notificationPanel",
+  "user" : "postgres",
+  "password" : "ab-320",
+  "database_ip" : "localhost",
+  "database_port" : 5432
+}
