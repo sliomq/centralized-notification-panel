@@ -80,6 +80,23 @@
   background-color: #218838;
 }
 
+.add-product-link-left {
+  position: fixed !important;
+  top: 20px !important;
+  right: 330px !important;
+  background-color: #28a745 !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  border-radius: 5px !important;
+  text-decoration: none !important;
+  font-size: 16px !important;
+  z-index: 1000 !important;
+}
+
+.add-product-link-left:hover {
+  background-color: #218838;
+}
+
 .exit-button {
   position: fixed;
   top: 20px;

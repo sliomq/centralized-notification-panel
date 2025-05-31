@@ -184,6 +184,10 @@ const Home = () => {
       <Link to="/add" className="add-product-link">
         Добавить помещение
       </Link>
+
+      <Link to="/add_type" className="add-product-link-left">
+        Добавить тип датчика
+      </Link>
       <button onClick={handleLogout} className='exit-button'>
         Выход
       </button>

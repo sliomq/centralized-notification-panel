@@ -6,6 +6,7 @@ import Form from './pages/Form';
 import Registation from './pages/Registration';
 import Authentication from './pages/Authentication';
 import RoomDetail from './pages/RoomDetail';
+import FormType from './pages/FormType'
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/add" element={<Form />} />
         <Route path="/detail/room/:room_id" element={<RoomDetail />} />
+        <Route path="/add_type" element={<FormType />} />
       </Routes>
     </Router>
   );

@@ -390,6 +390,7 @@ int startServer(pqxx::connection& conn) {
             res.body = "{\"error\":\"Unauthorized\"}";
             return res;
         }
+        
 
         string sqlReq = "INSERT INTO sensors(name, type_id, radius, room_id, pos_x, pos_y) VALUES ('" +
                        body["name"].get<string>() + "', " +
@@ -398,6 +399,7 @@ int startServer(pqxx::connection& conn) {
                        to_string(body["room_id"].get<int>()) + ", " +
                        to_string(body["pos_x"].get<double>()) + ", " +
                        to_string(body["pos_y"].get<double>()) + ") RETURNING *";
+
 
         try {
             work insertSensor(conn, sqlReq);
@@ -421,6 +423,7 @@ int startServer(pqxx::connection& conn) {
             res.body = "{\"error\":\"Database error\"}";
             cerr << "Ошибка при добавлении датчика: " << e.what() << endl;
         }
+
         return res;
     });
 
@@ -594,13 +597,17 @@ int startServer(pqxx::connection& conn) {
     });
 
     CROW_ROUTE(app, "/uploads/maps/<string>")
-    ([](const crow::request& req, crow::response& res, string filename) {
+    ([](const crow::request& req, string filename) {
+        crow::response res;
+        res.add_header("Content-Type", "application/json");
+        res.add_header("Access-Control-Allow-Origin", "*");
+
         string filepath = "uploads/maps/" + filename;
 
         if (!fs::exists(filepath)) {
             res.code = 404;
             res.body = "{\"error\":\"File not found\"}";
-            return;
+            return res;
         }
 
         string content_type = "application/octet-stream";
@@ -615,6 +622,8 @@ int startServer(pqxx::connection& conn) {
 
         res.set_static_file_info(filepath);
         res.add_header("Content-Type", content_type);
+        res.code = 200;
+        return res;
     });
 
     CROW_ROUTE(app, "/sensor-types").methods("GET"_method)
@@ -690,6 +699,35 @@ int startServer(pqxx::connection& conn) {
             cerr << "Ошибка при обновлении датчика: " << e.what() << endl;
         }
         return res;
+    });
+
+    CROW_ROUTE(app, "/sensor-types").methods("POST"_method)
+    ([&conn](const crow::request& req) {
+        crow::response res;
+        res.add_header("Content-Type", "application/json");
+        res.add_header("Access-Control-Allow-Origin", "*");
+
+        auto body = json::parse(req.body);
+        if (!verifyToken(body["token"].get<string>())) {
+            res.code = 401;
+            res.body = "{\"error\":\"Unauthorized\"}";
+            return res;
+        }
+
+        try {
+            string sqlReq = "insert into type_sensors(name) values('" + body["name"].get<string>() + "')";
+            work insertType(conn);
+            insertType.exec(sqlReq);
+            insertType.commit();
+            res.code = 201;
+            res.body = "{\"status\":\"Succes insert type sensors\"}";
+            return res;
+        }catch (const exception& e) {
+            res.code = 500;
+            res.body = "{\"error\":\"Database error\"}";
+            cerr << "Ошибка при добавлении типа датчика: " << e.what() << endl;
+            return res;
+        }
     });
 
     app.port(5000).run();
