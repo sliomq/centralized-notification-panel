@@ -4,7 +4,7 @@ services:
     image: postgres:13
     restart: always
     environment:
-      POSTGRES_DB: lab_work4
+      POSTGRES_DB: notificationPanel
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ab-320
     volumes:

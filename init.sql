@@ -5,7 +5,7 @@
 -- Dumped from database version 16.3 (Debian 16.3-1+b1)
 -- Dumped by pg_dump version 17.0 (Debian 17.0-1+b2)
 
--- Started on 2025-05-30 22:20:33 +07
+-- Started on 2025-06-01 21:43:19 +07
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -166,7 +166,8 @@ CREATE TABLE public.sensors (
     radius double precision NOT NULL,
     room_id integer NOT NULL,
     pos_x double precision NOT NULL,
-    pos_y double precision NOT NULL
+    pos_y double precision NOT NULL,
+    is_alert boolean NOT NULL
 );
 
 
@@ -368,7 +369,7 @@ COPY public.rooms (room_id, name, description) FROM stdin;
 -- Data for Name: sensors; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.sensors (sens_id, name, type_id, radius, room_id, pos_x, pos_y) FROM stdin;
+COPY public.sensors (sens_id, name, type_id, radius, room_id, pos_x, pos_y, is_alert) FROM stdin;
 \.
 
 
@@ -389,6 +390,8 @@ COPY public.type_events (type_event_id, name) FROM stdin;
 --
 
 COPY public.type_sensors (type_sens_id, name) FROM stdin;
+1	дымовой
+2	движение
 \.
 
 
@@ -407,7 +410,7 @@ SELECT pg_catalog.setval('public.events_event_id_seq', 1, false);
 -- Name: maps_map_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.maps_map_id_seq', 1, false);
+SELECT pg_catalog.setval('public.maps_map_id_seq', 6, true);
 
 
 --
@@ -416,7 +419,7 @@ SELECT pg_catalog.setval('public.maps_map_id_seq', 1, false);
 -- Name: rooms_room_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.rooms_room_id_seq', 8, true);
+SELECT pg_catalog.setval('public.rooms_room_id_seq', 12, true);
 
 
 --
@@ -425,7 +428,7 @@ SELECT pg_catalog.setval('public.rooms_room_id_seq', 8, true);
 -- Name: sensors_sens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.sensors_sens_id_seq', 1, false);
+SELECT pg_catalog.setval('public.sensors_sens_id_seq', 12, true);
 
 
 --
@@ -443,7 +446,7 @@ SELECT pg_catalog.setval('public.type_events_type_event_id_seq', 1, false);
 -- Name: type_sensors_type_sens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.type_sensors_type_sens_id_seq', 1, false);
+SELECT pg_catalog.setval('public.type_sensors_type_sens_id_seq', 2, true);
 
 
 --
@@ -510,21 +513,21 @@ ALTER TABLE ONLY public.type_sensors
 
 
 --
--- TOC entry 3256 (class 2606 OID 25704)
+-- TOC entry 3256 (class 2606 OID 25750)
 -- Name: maps room_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.maps
-    ADD CONSTRAINT room_fk FOREIGN KEY (room_id) REFERENCES public.rooms(room_id);
+    ADD CONSTRAINT room_fk FOREIGN KEY (room_id) REFERENCES public.rooms(room_id) ON DELETE CASCADE;
 
 
 --
--- TOC entry 3252 (class 2606 OID 25628)
+-- TOC entry 3252 (class 2606 OID 25755)
 -- Name: sensors room_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.sensors
-    ADD CONSTRAINT room_id_fk FOREIGN KEY (room_id) REFERENCES public.rooms(room_id);
+    ADD CONSTRAINT room_id_fk FOREIGN KEY (room_id) REFERENCES public.rooms(room_id) ON DELETE CASCADE;
 
 
 --
@@ -554,7 +557,7 @@ ALTER TABLE ONLY public.events
     ADD CONSTRAINT user_fk FOREIGN KEY (user_id) REFERENCES public.authentication(login) NOT VALID;
 
 
--- Completed on 2025-05-30 22:20:35 +07
+-- Completed on 2025-06-01 21:43:21 +07
 
 --
 -- PostgreSQL database dump complete
