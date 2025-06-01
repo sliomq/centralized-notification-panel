@@ -357,11 +357,12 @@ int startServer(pqxx::connection& conn) {
                 {"sens_id", resBD[i][0].as<int>()},
                 {"name", resBD[i][1].as<string>()},
                 {"type_id", resBD[i][2].as<int>()},
-                {"type_name", resBD[i][7].as<string>()},
+                {"type_name", resBD[i][8].as<string>()},
                 {"radius", resBD[i][3].as<double>()},
                 {"room_id", resBD[i][4].as<int>()},
                 {"pos_x", resBD[i][5].as<double>()},
-                {"pos_y", resBD[i][6].as<double>()}
+                {"pos_y", resBD[i][6].as<double>()},
+                {"is_alert", resBD[i][7].as<bool>()}
             };
             response.push_back(item);
         }
@@ -392,11 +393,11 @@ int startServer(pqxx::connection& conn) {
         }
         
 
-        string sqlReq = "INSERT INTO sensors(name, type_id, radius, room_id, pos_x, pos_y) VALUES ('" +
-                       body["name"].get<string>() + "', " +
+        string sqlReq = "INSERT INTO sensors(name, is_alert, type_id, radius, room_id, pos_x, pos_y) VALUES ('" +
+                       body["name"].get<string>() + "', false, " +
                        to_string(body["type_id"].get<int>()) + ", " +
                        to_string(body["radius"].get<double>()) + ", " +
-                       to_string(body["room_id"].get<int>()) + ", " +
+                       to_string(stoi(body["room_id"].get<string>())) + ", " +
                        to_string(body["pos_x"].get<double>()) + ", " +
                        to_string(body["pos_y"].get<double>()) + ") RETURNING *";
 
@@ -413,7 +414,8 @@ int startServer(pqxx::connection& conn) {
                 {"radius", resBD[0][3].as<double>()},
                 {"room_id", resBD[0][4].as<int>()},
                 {"pos_x", resBD[0][5].as<double>()},
-                {"pos_y", resBD[0][6].as<double>()}
+                {"pos_y", resBD[0][6].as<double>()},
+                {"is_alert", resBD[0][7].as<bool>()}
             };
 
             res.code = 201;
@@ -728,6 +730,67 @@ int startServer(pqxx::connection& conn) {
             cerr << "Ошибка при добавлении типа датчика: " << e.what() << endl;
             return res;
         }
+    });
+
+    CROW_ROUTE(app, "/rand").methods("POST"_method)
+    ([&conn](const crow::request& req) {
+        crow::response res;
+        res.add_header("Content-Type", "application/json");
+        res.add_header("Access-Control-Allow-Origin", "*");
+
+        auto body = json::parse(req.body);
+        int room_id = stoi(body["room_id"].get<string>());
+
+        string sqlReq = "select sens_id from sensors where room_id = " + to_string(room_id);
+        result resBD;
+        {
+            nontransaction sensIdAll(conn, sqlReq);
+            resBD = sensIdAll.exec(sqlReq);
+        }
+
+        vector<int> allSens;
+        for(auto item : resBD) {
+            allSens.push_back(item[0].as<int>());
+        }
+
+        if (allSens.size() == 0) {
+            res.code = 404;
+            json response = {"error", "don't found sensors"};
+            res.body = response.dump();
+            return res;
+        }
+
+        srand(time(0));
+        int randPosInVector = rand() % allSens.size();
+        sqlReq = "UPDATE sensors SET is_alert = true WHERE sens_id = " + to_string(allSens[randPosInVector]);
+
+        work insNewState(conn, sqlReq);
+        insNewState.exec(sqlReq);
+        insNewState.commit();
+
+        res.code = 200;
+        json response = {"датчик для тревоги: ", to_string(allSens[randPosInVector])};
+        res.body = response.dump();
+        return res;
+    });
+
+    CROW_ROUTE(app, "/noAlert").methods("POST"_method)
+    ([&conn](const crow::request& req) {
+        crow::response res;
+        res.add_header("Content-Type", "application/json");
+        res.add_header("Access-Control-Allow-Origin", "*");
+
+        auto body = json::parse(req.body);
+        int room_id = stoi(body["room_id"].get<string>());
+
+        string sqlReq = "UPDATE sensors SET is_alert = false WHERE room_id = " + to_string(room_id);
+        work updateSensor(conn, sqlReq);
+        updateSensor.exec(sqlReq);
+        updateSensor.commit();
+        res.code = 200;
+        json response = {"status", "Success no alert"};
+        res.body = response.dump();
+        return res;
     });
 
     app.port(5000).run();

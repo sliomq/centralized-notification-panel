@@ -132,6 +132,7 @@ const Home = () => {
     navigate('/'); // Перенаправляем на страницу входа
   };
 
+
   return (
     <div className="home">
       <div className="filters">
@@ -188,6 +189,7 @@ const Home = () => {
       <Link to="/add_type" className="add-product-link-left">
         Добавить тип датчика
       </Link>
+
       <button onClick={handleLogout} className='exit-button'>
         Выход
       </button>

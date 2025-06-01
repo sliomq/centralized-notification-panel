@@ -25,7 +25,7 @@
 .form-container select,
 .form-container input[type="text"],
 .form-container input[type="number"] {
-    width: 100%;
+    width: 96%;
     padding: 10px;
     margin-top: 5px;
     border: 1px solid #ddd;

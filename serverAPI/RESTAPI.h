@@ -15,6 +15,8 @@
 #include <string>
 #include <filesystem>
 #include <unordered_map>
+#include <random>
+#include <ctime>
 
 using json = nlohmann::json;
 using namespace std;

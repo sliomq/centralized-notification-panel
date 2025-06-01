@@ -180,4 +180,53 @@ canvas {
   background-color: #218838;
 }
 
+.no-alert {
+  position: fixed; /* Фиксированное позиционирование */
+  top: 18px; /* Отступ сверху */
+  right: 120px; /* Отступ справа */
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 16px;
+  z-index: 1000; /* Достаточно высокий z-index */
+}
+
+
+.no-alert:hover {
+  background-color: #218838;
+}
+
+.alert-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.alert-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.alert-modal-content button {
+  padding: 8px 15px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 
